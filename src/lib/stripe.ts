@@ -1,7 +1,8 @@
 import Stripe from 'stripe';
 
 function createStripeClient() {
-  return new Stripe(process.env.STRIPE_SECRET_KEY!);
+  const key = process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder';
+  return new Stripe(key);
 }
 
 export function getStripe() {

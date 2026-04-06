@@ -3,9 +3,11 @@ import Anthropic from '@anthropic-ai/sdk';
 import { analyzeGenderCoding } from '@/lib/gender-decoder';
 import type { AnalysisResult, Flag, GenderCodingResult } from '@/lib/types';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-});
+function getAnthropic() {
+  return new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY || '',
+  });
+}
 
 const DEMO_WORD_LIMIT = 300;
 
@@ -99,7 +101,7 @@ export async function POST(request: NextRequest) {
     const genderCoding = analyzeGenderCoding(textToAnalyze);
 
     // Call Claude API for comprehensive analysis
-    const message = await anthropic.messages.create({
+    const message = await getAnthropic().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4096,
       messages: [
