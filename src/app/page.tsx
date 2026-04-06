@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight, CheckCircle, AlertTriangle, Sparkles, BarChart3, Shield, Zap } from 'lucide-react';
+import { ArrowRight, AlertTriangle, Sparkles, BarChart3, Shield, Zap } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import HeroAnimation from '@/components/HeroAnimation';
@@ -41,11 +40,7 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="relative pt-32 pb-20 px-6 overflow-hidden">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-          >
+          <div className="animate-slide-up">
             <h1 className="font-display text-display-xl text-slate-deep mb-6">
               Your job description is why you&apos;re not finding great candidates.
             </h1>
@@ -58,35 +53,25 @@ export default function LandingPage() {
             >
               Check your JD free <ArrowRight className="w-5 h-5" />
             </a>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="relative"
-          >
+          <div className="animate-fade-in relative">
             <HeroAnimation />
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Live Demo */}
       <section id="demo" className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
+          <div className="text-center mb-12">
             <h2 className="font-display text-display-md text-slate-deep mb-4">
               Try it now — paste a JD snippet
             </h2>
             <p className="text-slate-light text-lg">
               Get an instant score. No sign-up required. Limited to 300 words.
             </p>
-          </motion.div>
+          </div>
 
           <div className="glass-card p-8">
             <textarea
@@ -115,29 +100,23 @@ export default function LandingPage() {
             </div>
 
             {demoScore !== null && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-8 flex flex-col items-center gap-6"
-              >
+              <div className="mt-8 flex flex-col items-center gap-6 animate-slide-up">
                 <ScoreGauge score={demoScore} size={160} label="Overall Score" />
                 {demoFlags.length > 0 && (
                   <div className="w-full space-y-3">
                     <h3 className="font-semibold text-slate-deep">Top Issues Found:</h3>
                     {demoFlags.map((flag, i) => (
-                      <motion.div
+                      <div
                         key={i}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.15 }}
-                        className="flex items-start gap-3 p-3 bg-coral-bg rounded-xl"
+                        className="flex items-start gap-3 p-3 bg-coral-bg rounded-xl animate-slide-up"
+                        style={{ animationDelay: `${i * 150}ms` }}
                       >
                         <AlertTriangle className="w-5 h-5 text-coral flex-shrink-0 mt-0.5" />
                         <div>
                           <span className="font-mono text-sm text-coral">&ldquo;{flag.phrase}&rdquo;</span>
                           <p className="text-sm text-slate-light mt-1">{flag.suggestion}</p>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -147,7 +126,7 @@ export default function LandingPage() {
                 >
                   Get the full analysis <ArrowRight className="w-4 h-4" />
                 </a>
-              </motion.div>
+              </div>
             )}
           </div>
         </div>
@@ -156,14 +135,9 @@ export default function LandingPage() {
       {/* Features */}
       <section id="features" className="py-20 px-6 bg-white/50">
         <div className="max-w-6xl mx-auto">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="font-display text-display-md text-center text-slate-deep mb-16"
-          >
+          <h2 className="font-display text-display-md text-center text-slate-deep mb-16">
             Three ways Rolecheck improves your hiring
-          </motion.h2>
+          </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
@@ -186,13 +160,10 @@ export default function LandingPage() {
                 color: 'mint',
               },
             ].map((feature, i) => (
-              <motion.div
+              <div
                 key={feature.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15 }}
-                className="glass-card p-8 hover:shadow-card-hover transition-shadow"
+                className="glass-card p-8 hover:shadow-card-hover transition-shadow animate-slide-up"
+                style={{ animationDelay: `${i * 150}ms` }}
               >
                 <div
                   className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 ${
@@ -207,7 +178,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="font-display text-display-sm text-slate-deep mb-3">{feature.title}</h3>
                 <p className="text-slate-light leading-relaxed">{feature.desc}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -216,44 +187,33 @@ export default function LandingPage() {
       {/* Benchmark */}
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="font-display text-display-md text-slate-deep mb-4">
-              See how your JDs compare
-            </h2>
-            <p className="text-lg text-slate-light mb-8">
-              Benchmark against similar live job postings from top companies hiring for the same role.
-              Know where you stand on word count, requirement count, and tone.
-            </p>
-            <div className="glass-card p-8 flex items-center justify-center gap-8 flex-wrap">
-              {['Word Count', 'Requirements', 'Tone Score', 'Inclusivity'].map((metric) => (
-                <div key={metric} className="text-center">
-                  <div className="font-mono text-2xl text-slate-deep font-semibold">--</div>
-                  <div className="text-sm text-slate-light mt-1">{metric}</div>
-                </div>
-              ))}
-            </div>
-            <p className="text-sm text-slate-light mt-4">
-              Available on Pro and Team plans
-            </p>
-          </motion.div>
+          <h2 className="font-display text-display-md text-slate-deep mb-4">
+            See how your JDs compare
+          </h2>
+          <p className="text-lg text-slate-light mb-8">
+            Benchmark against similar live job postings from top companies hiring for the same role.
+            Know where you stand on word count, requirement count, and tone.
+          </p>
+          <div className="glass-card p-8 flex items-center justify-center gap-8 flex-wrap">
+            {['Word Count', 'Requirements', 'Tone Score', 'Inclusivity'].map((metric) => (
+              <div key={metric} className="text-center">
+                <div className="font-mono text-2xl text-slate-deep font-semibold">--</div>
+                <div className="text-sm text-slate-light mt-1">{metric}</div>
+              </div>
+            ))}
+          </div>
+          <p className="text-sm text-slate-light mt-4">
+            Available on Pro and Team plans
+          </p>
         </div>
       </section>
 
       {/* Pricing */}
       <section id="pricing" className="py-20 px-6 bg-white/50">
         <div className="max-w-6xl mx-auto">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="font-display text-display-md text-center text-slate-deep mb-4"
-          >
+          <h2 className="font-display text-display-md text-center text-slate-deep mb-4">
             Simple, transparent pricing
-          </motion.h2>
+          </h2>
           <p className="text-center text-slate-light text-lg mb-16">
             Start free. Upgrade when you need more.
           </p>
