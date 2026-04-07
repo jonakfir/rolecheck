@@ -14,22 +14,34 @@ export default function LandingPage() {
   const [demoScore, setDemoScore] = useState<number | null>(null);
   const [demoLoading, setDemoLoading] = useState(false);
   const [demoFlags, setDemoFlags] = useState<Array<{ phrase: string; category: string; suggestion: string }>>([]);
+  const [demoError, setDemoError] = useState<string | null>(null);
   const [authOpen, setAuthOpen] = useState(false);
 
   const handleDemo = async () => {
     if (!demoText.trim() || demoText.split(/\s+/).length > 300) return;
     setDemoLoading(true);
+    setDemoScore(null);
+    setDemoFlags([]);
+    setDemoError(null);
     try {
       const res = await fetch('/api/analyze?demo=true', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jd_text: demoText, role_type: 'Engineering' }),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ error: 'Analysis failed' }));
+        throw new Error(errData.error || `Server error (${res.status})`);
+      }
       const data = await res.json();
+      if (typeof data.overall_score !== 'number' || isNaN(data.overall_score)) {
+        throw new Error('Invalid response from analysis engine');
+      }
       setDemoScore(data.overall_score);
       setDemoFlags(data.flags?.slice(0, 3) || []);
-    } catch {
+    } catch (err: any) {
       setDemoScore(null);
+      setDemoError(err?.message || 'Analysis failed. Please try again.');
     } finally {
       setDemoLoading(false);
     }
@@ -101,6 +113,13 @@ export default function LandingPage() {
                 )}
               </button>
             </div>
+
+            {demoError && (
+              <div className="mt-6 p-4 bg-coral/10 border border-coral/30 rounded-xl text-coral text-sm flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+                <span>{demoError}</span>
+              </div>
+            )}
 
             {demoScore !== null && (
               <div className="mt-8 flex flex-col items-center gap-6 animate-slide-up">
