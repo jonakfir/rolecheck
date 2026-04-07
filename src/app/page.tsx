@@ -7,12 +7,14 @@ import Footer from '@/components/Footer';
 import HeroAnimation from '@/components/HeroAnimation';
 import ScoreGauge from '@/components/ScoreGauge';
 import PricingCard from '@/components/PricingCard';
+import AuthModal from '@/components/AuthModal';
 
 export default function LandingPage() {
   const [demoText, setDemoText] = useState('');
   const [demoScore, setDemoScore] = useState<number | null>(null);
   const [demoLoading, setDemoLoading] = useState(false);
   const [demoFlags, setDemoFlags] = useState<Array<{ phrase: string; category: string; suggestion: string }>>([]);
+  const [authOpen, setAuthOpen] = useState(false);
 
   const handleDemo = async () => {
     if (!demoText.trim() || demoText.split(/\s+/).length > 300) return;
@@ -35,7 +37,8 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen">
-      <Navbar />
+      <Navbar onSignInClick={() => setAuthOpen(true)} />
+      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
 
       {/* Hero */}
       <section className="relative pt-32 pb-20 px-6 overflow-hidden">
