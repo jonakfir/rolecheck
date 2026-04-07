@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { analyzeGenderCoding } from '@/lib/gender-decoder';
 import { isAdmin } from '@/lib/admin';
-import { adminDb } from '@/lib/firebase/admin';
+import { createClient } from '@supabase/supabase-js';
 import type { AnalysisResult, Flag, GenderCodingResult } from '@/lib/types';
 import { PLANS } from '@/lib/stripe';
 
@@ -99,41 +99,48 @@ export async function POST(request: NextRequest) {
     if (!isDemo) {
       const userEmail = request.headers.get('x-user-email') || null;
 
-      if (userEmail && !isAdmin(userEmail)) {
-        try {
-          const snapshot = await adminDb
-            .collection('profiles')
-            .where('email', '==', userEmail)
-            .limit(1)
-            .get();
+      if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        const supabaseAdmin = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL,
+          process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
 
-          if (!snapshot.empty) {
-            const profile = snapshot.docs[0].data();
-            const plan = (profile.plan || 'free') as keyof typeof PLANS;
-            const limit = PLANS[plan]?.jds_per_month ?? 3;
-            const used = profile.jds_used_this_month || 0;
+        if (userEmail && !isAdmin(userEmail)) {
+          try {
+            const { data: profile } = await supabaseAdmin
+              .from('profiles')
+              .select('plan, jds_used_this_month')
+              .eq('email', userEmail)
+              .single();
 
-            if (limit !== -1 && used >= limit) {
-              return NextResponse.json(
-                {
-                  error: `You've used all ${limit} analyses for this month on the ${PLANS[plan]?.name || 'Free'} plan. Upgrade to Pro for unlimited analyses.`,
-                  code: 'USAGE_LIMIT_REACHED',
-                },
-                { status: 429 }
-              );
+            if (profile) {
+              const plan = (profile.plan || 'free') as keyof typeof PLANS;
+              const limit = PLANS[plan]?.jds_per_month ?? 3;
+              const used = profile.jds_used_this_month || 0;
+
+              if (limit !== -1 && used >= limit) {
+                return NextResponse.json(
+                  {
+                    error: `You've used all ${limit} analyses for this month on the ${PLANS[plan]?.name || 'Free'} plan. Upgrade to Pro for unlimited analyses.`,
+                    code: 'USAGE_LIMIT_REACHED',
+                  },
+                  { status: 429 }
+                );
+              }
+
+              // Increment usage counter
+              await supabaseAdmin
+                .from('profiles')
+                .update({ jds_used_this_month: used + 1 })
+                .eq('email', userEmail);
             }
-
-            // Increment usage counter
-            await snapshot.docs[0].ref.update({
-              jds_used_this_month: used + 1,
-            });
+          } catch (dbError) {
+            // If Supabase isn't configured yet, continue without limits
+            console.warn('Supabase usage check skipped:', dbError);
           }
-        } catch (dbError) {
-          // If Firebase isn't configured yet, continue without limits
-          console.warn('Firebase usage check skipped:', dbError);
         }
+        // Admin users: no limit check, no counter increment
       }
-      // Admin users: no limit check, no counter increment
     }
 
     const textToAnalyze = isDemo

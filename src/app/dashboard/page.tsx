@@ -22,8 +22,7 @@ import JDEditor from '@/components/JDEditor';
 import DiffView from '@/components/DiffView';
 import BenchmarkTable from '@/components/BenchmarkTable';
 import AnalysisHistory from '@/components/AnalysisHistory';
-import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
-import { auth } from '@/lib/firebase/client';
+import { createClient } from '@/lib/supabase/client';
 import { ROLE_TYPES } from '@/lib/types';
 import type { AnalysisResult, Flag, Analysis, RoleType } from '@/lib/types';
 
@@ -37,29 +36,52 @@ export default function DashboardPage() {
   const [selectedFlag, setSelectedFlag] = useState<Flag | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('results');
   const [history, setHistory] = useState<Analysis[]>([]);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isAdminUser, setIsAdminUser] = useState(false);
 
+  const supabase = createClient();
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
-      if (firebaseUser?.email) {
+    supabase.auth.getUser().then(async ({ data }) => {
+      setUser(data.user);
+      if (data.user?.email) {
         try {
-          const res = await fetch(`/api/me?email=${encodeURIComponent(firebaseUser.email)}`);
+          const res = await fetch(`/api/me?email=${encodeURIComponent(data.user.email)}`);
           const info = await res.json();
           setIsAdminUser(info.isAdmin);
         } catch {}
       }
     });
-    return () => unsubscribe();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   const loadHistory = useCallback(async () => {
-    // History loading via Firebase will be added when Firestore is configured
-    // For now, history is stored in-session only
+    if (!user?.id) return;
+    try {
+      const { data, error: histError } = await supabase
+        .from('analyses')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (!histError && data) {
+        setHistory(data as Analysis[]);
+      }
+    } catch {
+      // History loading is optional
+    }
   }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      loadHistory();
+    }
+  }, [user, loadHistory]);
 
   const handleAnalyze = async () => {
     if (!jdText.trim()) return;
@@ -120,7 +142,7 @@ export default function DashboardPage() {
   };
 
   const handleSignOut = async () => {
-    await signOut(auth);
+    await supabase.auth.signOut();
     window.location.href = '/';
   };
 

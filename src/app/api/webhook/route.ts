@@ -1,25 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { adminDb } from '@/lib/firebase/admin';
+import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
+
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  );
+}
 
 async function updateUserPlan(
   stripeCustomerId: string,
   plan: 'free' | 'pro' | 'team'
 ) {
-  // Find profile by stripe_customer_id
-  const snapshot = await adminDb
-    .collection('profiles')
-    .where('stripe_customer_id', '==', stripeCustomerId)
-    .limit(1)
-    .get();
+  const supabaseAdmin = getSupabaseAdmin();
 
-  if (snapshot.empty) {
+  const { data, error } = await supabaseAdmin
+    .from('profiles')
+    .select('id')
+    .eq('stripe_customer_id', stripeCustomerId)
+    .limit(1)
+    .single();
+
+  if (error || !data) {
     console.error(`No profile found for customer ${stripeCustomerId}`);
     return;
   }
 
-  await snapshot.docs[0].ref.update({ plan });
+  await supabaseAdmin
+    .from('profiles')
+    .update({ plan })
+    .eq('id', data.id);
 }
 
 function determinePlanFromSubscription(
@@ -65,6 +77,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const supabaseAdmin = getSupabaseAdmin();
+
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
@@ -81,19 +95,13 @@ export async function POST(request: NextRequest) {
 
         const userEmail = session.customer_details?.email;
         if (userEmail) {
-          // Find user profile by email
-          const snapshot = await adminDb
-            .collection('profiles')
-            .where('email', '==', userEmail)
-            .limit(1)
-            .get();
-
-          if (!snapshot.empty) {
-            await snapshot.docs[0].ref.update({
+          await supabaseAdmin
+            .from('profiles')
+            .update({
               stripe_customer_id: customerId,
               plan,
-            });
-          }
+            })
+            .eq('email', userEmail);
         }
 
         break;
