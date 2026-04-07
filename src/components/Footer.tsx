@@ -1,17 +1,17 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ExternalLink } from 'lucide-react';
+import { GitBranch, AtSign, Briefcase } from 'lucide-react';
 
 const FOOTER_LINKS = [
   { href: '/#features', label: 'Features' },
-  { href: '/pricing', label: 'Pricing' },
+  { href: '/#pricing', label: 'Pricing' },
   { href: '/dashboard', label: 'Dashboard' },
 ];
 
 const SOCIAL_LINKS = [
-  { href: '#', label: 'GitHub' },
-  { href: '#', label: 'Twitter' },
-  { href: '#', label: 'LinkedIn' },
+  { href: '#', label: 'GitHub', icon: GitBranch },
+  { href: '#', label: 'Twitter', icon: AtSign },
+  { href: '#', label: 'LinkedIn', icon: Briefcase },
 ];
 
 export default function Footer() {
@@ -72,9 +72,9 @@ export default function Footer() {
                     key={social.label}
                     href={social.href}
                     aria-label={social.label}
-                    className="w-9 h-9 rounded-lg bg-slate-deep/5 flex items-center justify-center text-slate-light hover:text-slate-deep hover:bg-slate-deep/10 transition-colors text-xs font-medium"
+                    className="w-9 h-9 rounded-lg bg-slate-deep/5 flex items-center justify-center text-slate-light hover:text-slate-deep hover:bg-slate-deep/10 transition-colors"
                   >
-                    {social.label[0]}
+                    <social.icon className="w-4 h-4" />
                   </a>
               ))}
             </div>
