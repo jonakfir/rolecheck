@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { analyzeGenderCoding } from '@/lib/gender-decoder';
+import { isAdmin } from '@/lib/admin';
+import { createClient } from '@supabase/supabase-js';
 import type { AnalysisResult, Flag, GenderCodingResult } from '@/lib/types';
+import { PLANS } from '@/lib/stripe';
 
 function getAnthropic() {
   return new Anthropic({
@@ -91,6 +94,51 @@ export async function POST(request: NextRequest) {
         { error: 'Missing or invalid role_type field' },
         { status: 400 }
       );
+    }
+
+    // --- Usage limit enforcement (skip for demo and admin) ---
+    if (!isDemo) {
+      const authHeader = request.headers.get('x-user-email');
+      const userEmail = authHeader || null;
+
+      // If we have Supabase creds, enforce limits for non-admins
+      if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        const supabaseAdmin = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL,
+          process.env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        // Try to get user from cookie-forwarded email or auth header
+        if (userEmail && !isAdmin(userEmail)) {
+          const { data: profile } = await supabaseAdmin
+            .from('profiles')
+            .select('plan, jds_used_this_month')
+            .eq('email', userEmail)
+            .single();
+
+          if (profile) {
+            const plan = profile.plan as keyof typeof PLANS;
+            const limit = PLANS[plan]?.jds_per_month ?? 3;
+
+            if (limit !== -1 && profile.jds_used_this_month >= limit) {
+              return NextResponse.json(
+                {
+                  error: `You've used all ${limit} analyses for this month on the ${PLANS[plan]?.name || 'Free'} plan. Upgrade to Pro for unlimited analyses.`,
+                  code: 'USAGE_LIMIT_REACHED',
+                },
+                { status: 429 }
+              );
+            }
+
+            // Increment usage counter
+            await supabaseAdmin
+              .from('profiles')
+              .update({ jds_used_this_month: profile.jds_used_this_month + 1 })
+              .eq('email', userEmail);
+          }
+        }
+        // Admin users: no limit check, no counter increment
+      }
     }
 
     const textToAnalyze = isDemo

@@ -38,11 +38,22 @@ export default function DashboardPage() {
   const [history, setHistory] = useState<Analysis[]>([]);
   const [user, setUser] = useState<any>(null);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isAdminUser, setIsAdminUser] = useState(false);
 
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    supabase.auth.getUser().then(async ({ data }) => {
+      setUser(data.user);
+      if (data.user?.email) {
+        try {
+          const res = await fetch(`/api/me?email=${encodeURIComponent(data.user.email)}`);
+          const info = await res.json();
+          setIsAdminUser(info.isAdmin);
+        } catch {}
+      }
+    });
   }, []);
 
   const loadHistory = useCallback(async () => {
@@ -65,11 +76,15 @@ export default function DashboardPage() {
     setLoading(true);
     setResult(null);
     setSelectedFlag(null);
+    setError(null);
 
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(user?.email ? { 'x-user-email': user.email } : {}),
+        },
         body: JSON.stringify({ jd_text: jdText, role_type: roleType }),
       });
 
@@ -98,8 +113,9 @@ export default function DashboardPage() {
       setResult(data);
       setActiveTab('results');
       loadHistory();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Analysis error:', err);
+      setError(err?.message || 'Analysis failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -126,13 +142,27 @@ export default function DashboardPage() {
         {/* Input Section */}
         <div className="glass-card p-8 mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="font-display text-display-sm text-slate-deep">Analyze a Job Description</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="font-display text-display-sm text-slate-deep">Analyze a Job Description</h1>
+              {isAdminUser && (
+                <span className="px-2 py-0.5 bg-mint/20 text-mint text-xs font-bold rounded-full uppercase tracking-wide">
+                  Admin — Unlimited
+                </span>
+              )}
+            </div>
             {user && (
               <button onClick={handleSignOut} className="text-slate-light hover:text-coral text-sm flex items-center gap-1">
                 <LogOut className="w-4 h-4" /> Sign out
               </button>
             )}
           </div>
+
+          {error && (
+            <div className="mb-4 p-4 bg-coral/10 border border-coral/30 rounded-xl text-coral text-sm flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              {error}
+            </div>
+          )}
 
           <div className="grid lg:grid-cols-4 gap-4 mb-4">
             <div className="lg:col-span-3">
