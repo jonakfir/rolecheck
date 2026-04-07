@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, Globe } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import {
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from 'firebase/auth';
+import { auth, googleProvider } from '@/lib/firebase/client';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -38,26 +43,30 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setError(null);
     setMessage(null);
 
-    const supabase = createClient();
-
     try {
       if (mode === 'signup') {
-        const { error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-        if (signUpError) throw signUpError;
-        setMessage('Check your email for the confirmation link.');
+        await createUserWithEmailAndPassword(auth, email, password);
+        setMessage('Account created! Redirecting...');
+        setTimeout(() => {
+          onClose();
+          window.location.href = '/dashboard';
+        }, 1000);
       } else {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (signInError) throw signInError;
+        await signInWithEmailAndPassword(auth, email, password);
         onClose();
+        window.location.href = '/dashboard';
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const firebaseError = err as { code?: string; message?: string };
+      const errorMessages: Record<string, string> = {
+        'auth/user-not-found': 'No account found with this email.',
+        'auth/wrong-password': 'Incorrect password.',
+        'auth/email-already-in-use': 'An account with this email already exists.',
+        'auth/weak-password': 'Password must be at least 6 characters.',
+        'auth/invalid-email': 'Invalid email address.',
+        'auth/invalid-credential': 'Invalid email or password.',
+      };
+      setError(errorMessages[firebaseError.code || ''] || firebaseError.message || 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -67,18 +76,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-
     try {
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-      if (oauthError) throw oauthError;
+      await signInWithPopup(auth, googleProvider);
+      onClose();
+      window.location.href = '/dashboard';
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const firebaseError = err as { message?: string };
+      setError(firebaseError.message || 'Google sign-in failed');
       setLoading(false);
     }
   };

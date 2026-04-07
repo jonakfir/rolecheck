@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Menu, X, LogIn } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
-import type { User } from '@supabase/supabase-js';
+import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
+import { auth } from '@/lib/firebase/client';
 
 const NAV_LINKS = [
   { href: '/#features', label: 'Features' },
-  { href: '/pricing', label: 'Pricing' },
+  { href: '/#pricing', label: 'Pricing' },
   { href: '/dashboard', label: 'Dashboard' },
 ];
 
@@ -23,19 +23,10 @@ export default function Navbar({ onSignInClick }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const supabase = createClient();
-
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
     });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -47,9 +38,9 @@ export default function Navbar({ onSignInClick }: NavbarProps) {
   }, []);
 
   const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await signOut(auth);
     setUser(null);
+    window.location.href = '/';
   };
 
   return (
@@ -95,10 +86,10 @@ export default function Navbar({ onSignInClick }: NavbarProps) {
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-coral to-mint flex items-center justify-center text-white text-xs font-bold">
-                    {user.email?.charAt(0).toUpperCase() ?? 'U'}
+                    {(user.email || user.displayName || 'U').charAt(0).toUpperCase()}
                   </div>
                   <span className="text-sm text-slate-deep/70 max-w-[160px] truncate">
-                    {user.email}
+                    {user.email || user.displayName}
                   </span>
                 </div>
                 <button
@@ -149,10 +140,10 @@ export default function Navbar({ onSignInClick }: NavbarProps) {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-coral to-mint flex items-center justify-center text-white text-xs font-bold">
-                      {user.email?.charAt(0).toUpperCase() ?? 'U'}
+                      {(user.email || user.displayName || 'U').charAt(0).toUpperCase()}
                     </div>
                     <span className="text-sm text-slate-deep/70 truncate">
-                      {user.email}
+                      {user.email || user.displayName}
                     </span>
                   </div>
                   <button

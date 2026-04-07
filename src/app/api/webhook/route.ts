@@ -1,32 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { createClient } from '@supabase/supabase-js';
+import { adminDb } from '@/lib/firebase/admin';
 import Stripe from 'stripe';
-
-// Use service role key for admin-level access in webhooks
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
-    process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
-  );
-}
 
 async function updateUserPlan(
   stripeCustomerId: string,
   plan: 'free' | 'pro' | 'team'
 ) {
-  const { error } = await getSupabaseAdmin()
-    .from('profiles')
-    .update({ plan })
-    .eq('stripe_customer_id', stripeCustomerId);
+  // Find profile by stripe_customer_id
+  const snapshot = await adminDb
+    .collection('profiles')
+    .where('stripe_customer_id', '==', stripeCustomerId)
+    .limit(1)
+    .get();
 
-  if (error) {
-    console.error(
-      `Failed to update plan for customer ${stripeCustomerId}:`,
-      error
-    );
-    throw new Error(`Database update failed: ${error.message}`);
+  if (snapshot.empty) {
+    console.error(`No profile found for customer ${stripeCustomerId}`);
+    return;
   }
+
+  await snapshot.docs[0].ref.update({ plan });
 }
 
 function determinePlanFromSubscription(
@@ -83,30 +76,24 @@ export async function POST(request: NextRequest) {
           break;
         }
 
-        // Retrieve the subscription to determine the plan
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         const plan = determinePlanFromSubscription(subscription);
 
-        // Link the Stripe customer to the Supabase user if not already linked
         const userEmail = session.customer_details?.email;
         if (userEmail) {
-          const { data: existingProfile } = await getSupabaseAdmin()
-            .from('profiles')
-            .select('id')
-            .eq('stripe_customer_id', customerId)
-            .single();
+          // Find user profile by email
+          const snapshot = await adminDb
+            .collection('profiles')
+            .where('email', '==', userEmail)
+            .limit(1)
+            .get();
 
-          if (!existingProfile) {
-            // Try to find user by email and link the Stripe customer ID
-            await getSupabaseAdmin()
-              .from('profiles')
-              .update({ stripe_customer_id: customerId, plan })
-              .eq('email', userEmail);
-          } else {
-            await updateUserPlan(customerId, plan);
+          if (!snapshot.empty) {
+            await snapshot.docs[0].ref.update({
+              stripe_customer_id: customerId,
+              plan,
+            });
           }
-        } else {
-          await updateUserPlan(customerId, plan);
         }
 
         break;
@@ -125,13 +112,11 @@ export async function POST(request: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
 
-        // Revert to free plan when subscription is cancelled
         await updateUserPlan(customerId, 'free');
         break;
       }
 
       default:
-        // Unhandled event type — acknowledge receipt
         break;
     }
 

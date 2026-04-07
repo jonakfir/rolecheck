@@ -22,7 +22,8 @@ import JDEditor from '@/components/JDEditor';
 import DiffView from '@/components/DiffView';
 import BenchmarkTable from '@/components/BenchmarkTable';
 import AnalysisHistory from '@/components/AnalysisHistory';
-import { createClient } from '@/lib/supabase/client';
+import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
+import { auth } from '@/lib/firebase/client';
 import { ROLE_TYPES } from '@/lib/types';
 import type { AnalysisResult, Flag, Analysis, RoleType } from '@/lib/types';
 
@@ -36,40 +37,29 @@ export default function DashboardPage() {
   const [selectedFlag, setSelectedFlag] = useState<Flag | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('results');
   const [history, setHistory] = useState<Analysis[]>([]);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isAdminUser, setIsAdminUser] = useState(false);
 
-  const supabase = createClient();
-
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
-      setUser(data.user);
-      if (data.user?.email) {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setUser(firebaseUser);
+      if (firebaseUser?.email) {
         try {
-          const res = await fetch(`/api/me?email=${encodeURIComponent(data.user.email)}`);
+          const res = await fetch(`/api/me?email=${encodeURIComponent(firebaseUser.email)}`);
           const info = await res.json();
           setIsAdminUser(info.isAdmin);
         } catch {}
       }
     });
+    return () => unsubscribe();
   }, []);
 
   const loadHistory = useCallback(async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from('analyses')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(20);
-    if (data) setHistory(data as Analysis[]);
+    // History loading via Firebase will be added when Firestore is configured
+    // For now, history is stored in-session only
   }, [user]);
-
-  useEffect(() => {
-    if (user) loadHistory();
-  }, [user, loadHistory]);
 
   const handleAnalyze = async () => {
     if (!jdText.trim()) return;
@@ -130,7 +120,7 @@ export default function DashboardPage() {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await signOut(auth);
     window.location.href = '/';
   };
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { analyzeGenderCoding } from '@/lib/gender-decoder';
 import { isAdmin } from '@/lib/admin';
-import { createClient } from '@supabase/supabase-js';
+import { adminDb } from '@/lib/firebase/admin';
 import type { AnalysisResult, Flag, GenderCodingResult } from '@/lib/types';
 import { PLANS } from '@/lib/stripe';
 
@@ -55,7 +55,6 @@ function mergeGenderFlags(
     suggestion: `Consider replacing "${word}" with a more neutral alternative that conveys the same meaning without gendered connotations.`,
   }));
 
-  // Deduplicate: skip gender decoder flags if the AI already flagged the same phrase
   const existingPhrases = new Set(
     existingFlags
       .filter((f) => f.category === 'Gendered Language')
@@ -98,29 +97,23 @@ export async function POST(request: NextRequest) {
 
     // --- Usage limit enforcement (skip for demo and admin) ---
     if (!isDemo) {
-      const authHeader = request.headers.get('x-user-email');
-      const userEmail = authHeader || null;
+      const userEmail = request.headers.get('x-user-email') || null;
 
-      // If we have Supabase creds, enforce limits for non-admins
-      if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
-        const supabaseAdmin = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL,
-          process.env.SUPABASE_SERVICE_ROLE_KEY
-        );
+      if (userEmail && !isAdmin(userEmail)) {
+        try {
+          const snapshot = await adminDb
+            .collection('profiles')
+            .where('email', '==', userEmail)
+            .limit(1)
+            .get();
 
-        // Try to get user from cookie-forwarded email or auth header
-        if (userEmail && !isAdmin(userEmail)) {
-          const { data: profile } = await supabaseAdmin
-            .from('profiles')
-            .select('plan, jds_used_this_month')
-            .eq('email', userEmail)
-            .single();
-
-          if (profile) {
-            const plan = profile.plan as keyof typeof PLANS;
+          if (!snapshot.empty) {
+            const profile = snapshot.docs[0].data();
+            const plan = (profile.plan || 'free') as keyof typeof PLANS;
             const limit = PLANS[plan]?.jds_per_month ?? 3;
+            const used = profile.jds_used_this_month || 0;
 
-            if (limit !== -1 && profile.jds_used_this_month >= limit) {
+            if (limit !== -1 && used >= limit) {
               return NextResponse.json(
                 {
                   error: `You've used all ${limit} analyses for this month on the ${PLANS[plan]?.name || 'Free'} plan. Upgrade to Pro for unlimited analyses.`,
@@ -131,14 +124,16 @@ export async function POST(request: NextRequest) {
             }
 
             // Increment usage counter
-            await supabaseAdmin
-              .from('profiles')
-              .update({ jds_used_this_month: profile.jds_used_this_month + 1 })
-              .eq('email', userEmail);
+            await snapshot.docs[0].ref.update({
+              jds_used_this_month: used + 1,
+            });
           }
+        } catch (dbError) {
+          // If Firebase isn't configured yet, continue without limits
+          console.warn('Firebase usage check skipped:', dbError);
         }
-        // Admin users: no limit check, no counter increment
       }
+      // Admin users: no limit check, no counter increment
     }
 
     const textToAnalyze = isDemo
