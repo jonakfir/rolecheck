@@ -55,7 +55,7 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="relative pt-32 pb-20 px-6 overflow-hidden">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <div className="animate-slide-up">
+          <div>
             <h1 className="font-display text-display-xl text-slate-deep mb-6">
               Your job description is why you&apos;re not finding great candidates.
             </h1>
@@ -70,7 +70,7 @@ export default function LandingPage() {
             </a>
           </div>
 
-          <div className="animate-fade-in relative">
+          <div className="relative">
             <HeroAnimation />
           </div>
         </div>
@@ -184,8 +184,7 @@ export default function LandingPage() {
             ].map((feature, i) => (
               <div
                 key={feature.title}
-                className="glass-card p-8 hover:shadow-card-hover transition-shadow animate-slide-up"
-                style={{ animationDelay: `${i * 150}ms` }}
+                className="glass-card p-8 hover:shadow-card-hover transition-shadow"
               >
                 <div
                   className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 ${
