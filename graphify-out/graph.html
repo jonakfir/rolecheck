@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>rolecheck Knowledge Graph</title>
+<style>
+body { margin:0; background:#0a0a0a; font-family:system-ui; color:#fff; }
+svg { width:100vw; height:100vh; }
+.node { cursor:pointer; }
+.node circle { fill:#ef4444; stroke:#fff3; stroke-width:1.5; }
+.node text { font-size:10px; fill:#fff; text-anchor:middle; }
+.link { stroke:#444; stroke-width:1; opacity:0.6; }
+h1 { position:fixed; top:10px; left:20px; font-size:18px; color:#ef4444; z-index:10; }
+.stats { position:fixed; top:40px; left:20px; font-size:13px; color:#888; z-index:10; }
+</style>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+</head><body>
+<h1>rolecheck Knowledge Graph</h1>
+<div class="stats">23 nodes, 56 edges</div>
+<svg></svg>
+<script>
+const nodes = [{"id": "page", "label": "page.tsx", "type": ""}, {"id": "page_handleanalyze", "label": "handleAnalyze()", "type": ""}, {"id": "page_handlecopyrewrite", "label": "handleCopyRewrite()", "type": ""}, {"id": "page_handlesignout", "label": "handleSignOut()", "type": ""}, {"id": "route", "label": "route.ts", "type": ""}, {"id": "route_getsupabaseadmin", "label": "getSupabaseAdmin()", "type": ""}, {"id": "route_updateuserplan", "label": "updateUserPlan()", "type": ""}, {"id": "route_determineplanfromsubscription", "label": "determinePlanFromSubscription()", "type": ""}, {"id": "route_post", "label": "POST()", "type": ""}, {"id": "route", "label": "route.ts", "type": ""}, {"id": "route_get", "label": "GET()", "type": ""}, {"id": "route", "label": "route.ts", "type": ""}, {"id": "route_getanthropic", "label": "getAnthropic()", "type": ""}, {"id": "route_builduserprompt", "label": "buildUserPrompt()", "type": ""}, {"id": "route_mergegenderflags", "label": "mergeGenderFlags()", "type": ""}, {"id": "route_truncatetowordlimit", "label": "truncateToWordLimit()", "type": ""}, {"id": "route_post", "label": "POST()", "type": ""}, {"id": "middleware", "label": "middleware.ts", "type": ""}, {"id": "middleware_updatesession", "label": "updateSession()", "type": ""}, {"id": "client", "label": "client.ts", "type": ""}, {"id": "client_createclient", "label": "createClient()", "type": ""}, {"id": "server", "label": "server.ts", "type": ""}, {"id": "server_createserversupabaseclient", "label": "createServerSupabaseClient()", "type": ""}];
+const links = [{"source": "page", "target": "react"}, {"source": "page", "target": "framer_motion"}, {"source": "page", "target": "lucide_react"}, {"source": "page", "target": "navbar"}, {"source": "page", "target": "scoregauge"}, {"source": "page", "target": "subscorebar"}, {"source": "page", "target": "flagitem"}, {"source": "page", "target": "jdeditor"}, {"source": "page", "target": "diffview"}, {"source": "page", "target": "benchmarktable"}, {"source": "page", "target": "analysishistory"}, {"source": "page", "target": "client"}, {"source": "page", "target": "types"}, {"source": "page", "target": "types"}, {"source": "page", "target": "page_handleanalyze"}, {"source": "page", "target": "page_handlecopyrewrite"}, {"source": "page", "target": "page_handlesignout"}, {"source": "route", "target": "server"}, {"source": "route", "target": "stripe"}, {"source": "route", "target": "supabase_js"}, {"source": "route", "target": "stripe"}, {"source": "route", "target": "route_getsupabaseadmin"}, {"source": "route", "target": "route_updateuserplan"}, {"source": "route", "target": "route_determineplanfromsubscription"}, {"source": "route", "target": "route_post"}, {"source": "route_updateuserplan", "target": "route_getsupabaseadmin"}, {"source": "route_post", "target": "route_getsupabaseadmin"}, {"source": "route_post", "target": "route_determineplanfromsubscription"}, {"source": "route_post", "target": "route_updateuserplan"}, {"source": "route", "target": "server"}, {"source": "route", "target": "server"}, {"source": "route", "target": "route_get"}, {"source": "route", "target": "server"}, {"source": "route", "target": "sdk"}, {"source": "route", "target": "gender_decoder"}, {"source": "route", "target": "admin"}, {"source": "route", "target": "supabase_js"}, {"source": "route", "target": "types"}, {"source": "route", "target": "stripe"}, {"source": "route", "target": "route_getanthropic"}, {"source": "route", "target": "route_builduserprompt"}, {"source": "route", "target": "route_mergegenderflags"}, {"source": "route", "target": "route_truncatetowordlimit"}, {"source": "route", "target": "route_post"}, {"source": "route_post", "target": "route_truncatetowordlimit"}, {"source": "route_post", "target": "route_getanthropic"}, {"source": "route_post", "target": "route_builduserprompt"}, {"source": "route_post", "target": "route_mergegenderflags"}, {"source": "middleware", "target": "ssr"}, {"source": "middleware", "target": "server"}, {"source": "middleware", "target": "middleware_updatesession"}, {"source": "client", "target": "ssr"}, {"source": "client", "target": "client_createclient"}, {"source": "server", "target": "ssr"}, {"source": "server", "target": "headers"}, {"source": "server", "target": "server_createserversupabaseclient"}];
+const svg = d3.select("svg");
+const width = window.innerWidth, height = window.innerHeight;
+const sim = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).id(d=>d.id).distance(80))
+  .force("charge", d3.forceManyBody().strength(-200))
+  .force("center", d3.forceCenter(width/2, height/2));
+const link = svg.selectAll(".link").data(links).join("line").attr("class","link");
+const node = svg.selectAll(".node").data(nodes).join("g").attr("class","node")
+  .call(d3.drag().on("start",(e,d)=>{if(!e.active)sim.alphaTarget(0.3).restart();d.fx=d.x;d.fy=d.y;})
+  .on("drag",(e,d)=>{d.fx=e.x;d.fy=e.y;}).on("end",(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}));
+node.append("circle").attr("r",8);
+node.append("text").text(d=>d.label).attr("dy",20);
+sim.on("tick",()=>{link.attr("x1",d=>d.source.x).attr("y1",d=>d.source.y).attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);
+node.attr("transform",d=>\`translate(\${d.x},\${d.y})\`);});
+</script></body></html>
