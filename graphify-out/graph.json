@@ -1,0 +1,673 @@
+{
+  "nodes": [
+    {
+      "id": "page",
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "page_handleanalyze",
+      "label": "handleAnalyze()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L86"
+    },
+    {
+      "id": "page_handlecopyrewrite",
+      "label": "handleCopyRewrite()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L136"
+    },
+    {
+      "id": "page_handlesignout",
+      "label": "handleSignOut()",
+      "file_type": "code",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L144"
+    },
+    {
+      "id": "route",
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "route_getsupabaseadmin",
+      "label": "getSupabaseAdmin()",
+      "file_type": "code",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L6"
+    },
+    {
+      "id": "route_updateuserplan",
+      "label": "updateUserPlan()",
+      "file_type": "code",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L13"
+    },
+    {
+      "id": "route_determineplanfromsubscription",
+      "label": "determinePlanFromSubscription()",
+      "file_type": "code",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L37"
+    },
+    {
+      "id": "route_post",
+      "label": "POST()",
+      "file_type": "code",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L50"
+    },
+    {
+      "id": "route",
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "src/app/api/auth/callback/route.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "route_get",
+      "label": "GET()",
+      "file_type": "code",
+      "source_file": "src/app/api/auth/callback/route.ts",
+      "source_location": "L4"
+    },
+    {
+      "id": "route",
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "route_getanthropic",
+      "label": "getAnthropic()",
+      "file_type": "code",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L9"
+    },
+    {
+      "id": "route_builduserprompt",
+      "label": "buildUserPrompt()",
+      "file_type": "code",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L19"
+    },
+    {
+      "id": "route_mergegenderflags",
+      "label": "mergeGenderFlags()",
+      "file_type": "code",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L47"
+    },
+    {
+      "id": "route_truncatetowordlimit",
+      "label": "truncateToWordLimit()",
+      "file_type": "code",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L71"
+    },
+    {
+      "id": "route_post",
+      "label": "POST()",
+      "file_type": "code",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L77"
+    },
+    {
+      "id": "middleware",
+      "label": "middleware.ts",
+      "file_type": "code",
+      "source_file": "src/lib/supabase/middleware.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "middleware_updatesession",
+      "label": "updateSession()",
+      "file_type": "code",
+      "source_file": "src/lib/supabase/middleware.ts",
+      "source_location": "L4"
+    },
+    {
+      "id": "client",
+      "label": "client.ts",
+      "file_type": "code",
+      "source_file": "src/lib/supabase/client.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "client_createclient",
+      "label": "createClient()",
+      "file_type": "code",
+      "source_file": "src/lib/supabase/client.ts",
+      "source_location": "L3"
+    },
+    {
+      "id": "server",
+      "label": "server.ts",
+      "file_type": "code",
+      "source_file": "src/lib/supabase/server.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "server_createserversupabaseclient",
+      "label": "createServerSupabaseClient()",
+      "file_type": "code",
+      "source_file": "src/lib/supabase/server.ts",
+      "source_location": "L4"
+    }
+  ],
+  "edges": [
+    {
+      "source": "page",
+      "target": "react",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "framer_motion",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "lucide_react",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "navbar",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "scoregauge",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "subscorebar",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "flagitem",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "jdeditor",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "diffview",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "benchmarktable",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "analysishistory",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "client",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "page_handleanalyze",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L86",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "page_handlecopyrewrite",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L136",
+      "weight": 1.0
+    },
+    {
+      "source": "page",
+      "target": "page_handlesignout",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/dashboard/page.tsx",
+      "source_location": "L144",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "server",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "stripe",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "supabase_js",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "stripe",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "route_getsupabaseadmin",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "route_updateuserplan",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "route_determineplanfromsubscription",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "route_post",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "route_updateuserplan",
+      "target": "route_getsupabaseadmin",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L17",
+      "weight": 0.8
+    },
+    {
+      "source": "route_post",
+      "target": "route_getsupabaseadmin",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L80",
+      "weight": 0.8
+    },
+    {
+      "source": "route_post",
+      "target": "route_determineplanfromsubscription",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L94",
+      "weight": 0.8
+    },
+    {
+      "source": "route_post",
+      "target": "route_updateuserplan",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "src/app/api/webhook/route.ts",
+      "source_location": "L115",
+      "weight": 0.8
+    },
+    {
+      "source": "route",
+      "target": "server",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/auth/callback/route.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "server",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/auth/callback/route.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "route_get",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/auth/callback/route.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "server",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "sdk",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "gender_decoder",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "admin",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "supabase_js",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "types",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "stripe",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "route_getanthropic",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "route_builduserprompt",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "route_mergegenderflags",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "route_truncatetowordlimit",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L71",
+      "weight": 1.0
+    },
+    {
+      "source": "route",
+      "target": "route_post",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "route_post",
+      "target": "route_truncatetowordlimit",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L147",
+      "weight": 0.8
+    },
+    {
+      "source": "route_post",
+      "target": "route_getanthropic",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L154",
+      "weight": 0.8
+    },
+    {
+      "source": "route_post",
+      "target": "route_builduserprompt",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L160",
+      "weight": 0.8
+    },
+    {
+      "source": "route_post",
+      "target": "route_mergegenderflags",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "source_file": "src/app/api/analyze/route.ts",
+      "source_location": "L198",
+      "weight": 0.8
+    },
+    {
+      "source": "middleware",
+      "target": "ssr",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/supabase/middleware.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "middleware",
+      "target": "server",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/supabase/middleware.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "middleware",
+      "target": "middleware_updatesession",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/supabase/middleware.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "client",
+      "target": "ssr",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/supabase/client.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "client",
+      "target": "client_createclient",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/supabase/client.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "server",
+      "target": "ssr",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/supabase/server.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "server",
+      "target": "headers",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/supabase/server.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "server",
+      "target": "server_createserversupabaseclient",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/supabase/server.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}
